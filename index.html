@@ -47,8 +47,10 @@
         --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         --nav-bg: rgba(8, 8, 13, 0.8);
         --toggle-bg: #1a1a28;
+        --strength-track: #1a1a28;
         --slider-track: #1a1a28;
         --checkbox-bg: #1a1a28;
+        --toast-bg: #1a1a28;
       }
 
       [data-theme="light"] {
@@ -73,8 +75,10 @@
         --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
         --nav-bg: rgba(244, 241, 236, 0.8);
         --toggle-bg: #ddd9d2;
+        --strength-track: #ddd9d2;
         --slider-track: #ddd9d2;
         --checkbox-bg: #ddd9d2;
+        --toast-bg: #1a1a2e;
       }
 
       html {
@@ -292,7 +296,7 @@
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
         transition: all 0.3s;
       }
 
@@ -345,6 +349,67 @@
 
       .icon-btn:active {
         transform: scale(0.95);
+      }
+
+      .icon-btn.copied {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      /* STRENGTH BAR */
+      .strength-section {
+        margin-bottom: 2rem;
+      }
+
+      .strength-bar-track {
+        width: 100%;
+        height: 6px;
+        background: var(--strength-track);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        transition: background var(--transition);
+      }
+
+      .strength-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition:
+          width 0.5s var(--ease),
+          background 0.5s var(--ease);
+        width: 0%;
+      }
+
+      .strength-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .strength-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+
+      .strength-time {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-dim);
+      }
+
+      .strength-weak {
+        color: var(--red);
+      }
+      .strength-fair {
+        color: var(--orange);
+      }
+      .strength-good {
+        color: var(--accent-light);
+      }
+      .strength-strong {
+        color: var(--green);
       }
 
       /* LENGTH SLIDER */
@@ -400,6 +465,14 @@
         background: var(--accent);
         box-shadow: 0 2px 10px var(--accent-glow-strong);
         cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+        box-shadow: 0 2px 16px var(--accent-glow-strong);
       }
 
       input[type="range"]::-moz-range-thumb {
@@ -526,6 +599,40 @@
         transform: translateY(0) scale(0.98);
       }
 
+      .generate-btn .spin {
+        display: inline-block;
+        transition: transform 0.4s;
+      }
+
+      .generate-btn:active .spin {
+        transform: rotate(180deg);
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--toast-bg);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        opacity: 0;
+        transition: all 0.4s var(--ease);
+        pointer-events: none;
+        backdrop-filter: blur(10px);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
       /* FOOTER */
       .footer {
         text-align: center;
@@ -564,6 +671,19 @@
           var(--slider-track) var(--progress, 50%),
           var(--slider-track) 100%
         );
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
       }
     </style>
   </head>
@@ -607,6 +727,17 @@
             <button class="icon-btn" id="refreshBtn" title="Новый пароль">
               🔄
             </button>
+          </div>
+        </div>
+
+        <!-- NEW: Strength indicator -->
+        <div class="strength-section">
+          <div class="strength-bar-track">
+            <div class="strength-bar-fill" id="strengthFill"></div>
+          </div>
+          <div class="strength-info">
+            <span class="strength-label" id="strengthLabel">-</span>
+            <span class="strength-time" id="strengthTime"></span>
           </div>
         </div>
 
@@ -675,6 +806,9 @@
       </p>
     </footer>
 
+    <!-- NEW: Toast -->
+    <div class="toast" id="toast"></div>
+
     <script>
       // ═══ THEME ═══
       const html = document.documentElement;
@@ -739,18 +873,93 @@
         return password.join("");
       }
 
+      // ═══ NEW: STRENGTH CALCULATION ═══
+      function calcStrength(pw) {
+        if (!pw) return { level: 0, label: "-", time: "", cls: "" };
+
+        let pool = 0;
+        if (/[a-z]/.test(pw)) pool += 26;
+        if (/[A-Z]/.test(pw)) pool += 26;
+        if (/[0-9]/.test(pw)) pool += 10;
+        if (/[^a-zA-Z0-9]/.test(pw)) pool += 32;
+
+        const entropy = pw.length * Math.log2(pool || 1);
+        const secs = Math.pow(2, entropy) / 1e10;
+
+        let time;
+        if (secs < 1) time = "мгновенно";
+        else if (secs < 60) time = `~${Math.ceil(secs)} сек`;
+        else if (secs < 3600) time = `~${Math.ceil(secs / 60)} мин`;
+        else if (secs < 86400) time = `~${Math.ceil(secs / 3600)} ч`;
+        else if (secs < 86400 * 365) time = `~${Math.ceil(secs / 86400)} дн`;
+        else if (secs < 86400 * 365 * 1e3)
+          time = `~${Math.ceil(secs / (86400 * 365))} лет`;
+        else if (secs < 86400 * 365 * 1e6)
+          time = `~${(secs / (86400 * 365e3)).toFixed(0)}K лет`;
+        else if (secs < 86400 * 365 * 1e9)
+          time = `~${(secs / (86400 * 365e6)).toFixed(0)}M лет`;
+        else time = `${(secs / (86400 * 365e9)).toFixed(0)}B+ лет`;
+
+        let level, label, cls;
+        if (entropy < 30) {
+          level = 15;
+          label = "Очень слабый";
+          cls = "strength-weak";
+        } else if (entropy < 50) {
+          level = 35;
+          label = "Слабый";
+          cls = "strength-fair";
+        } else if (entropy < 70) {
+          level = 60;
+          label = "Хороший";
+          cls = "strength-good";
+        } else if (entropy < 90) {
+          level = 80;
+          label = "Сильный";
+          cls = "strength-strong";
+        } else {
+          level = 100;
+          label = "Отличный";
+          cls = "strength-strong";
+        }
+
+        return { level, label, time: `взлом: ${time}`, cls };
+      }
+
       // ═══ UI ═══
       const passwordText = document.getElementById("passwordText");
+      const strengthFill = document.getElementById("strengthFill");
+      const strengthLabel = document.getElementById("strengthLabel");
+      const strengthTime = document.getElementById("strengthTime");
       const lengthSlider = document.getElementById("lengthSlider");
       const lengthValue = document.getElementById("lengthValue");
+
+      const barColors = {
+        "strength-weak": "var(--red)",
+        "strength-fair": "var(--orange)",
+        "strength-good": "var(--accent-light)",
+        "strength-strong": "var(--green)",
+      };
 
       function updatePassword() {
         const pw = generatePassword();
         if (!pw) {
           passwordText.textContent = "Выберите хотя бы один тип";
+          strengthFill.style.width = "0%";
+          strengthLabel.textContent = "-";
+          strengthLabel.className = "strength-label";
+          strengthTime.textContent = "";
           return;
         }
         passwordText.textContent = pw;
+
+        // NEW: Update strength indicator
+        const s = calcStrength(pw);
+        strengthFill.style.width = s.level + "%";
+        strengthFill.style.background = barColors[s.cls] || "var(--accent)";
+        strengthLabel.textContent = s.label;
+        strengthLabel.className = "strength-label " + s.cls;
+        strengthTime.textContent = s.time;
       }
 
       // ═══ SLIDER ═══
@@ -771,22 +980,28 @@
         updatePassword();
       });
 
-      // ═══ CHAR OPTIONS ═══
+      // ═══ CHAR OPTIONS (updated with shake animation) ═══
       document.querySelectorAll(".char-option").forEach((el) => {
         el.addEventListener("click", () => {
           const t = el.dataset.type;
           const cnt = Object.values(state.options).filter(Boolean).length;
-          if (state.options[t] && cnt <= 1) return;
+          if (state.options[t] && cnt <= 1) {
+            showToast("⚠️ Нужен хотя бы один тип символов");
+            el.style.animation = "shake 0.4s ease";
+            setTimeout(() => (el.style.animation = ""), 400);
+            return;
+          }
           state.options[t] = !state.options[t];
           el.classList.toggle("active");
           updatePassword();
         });
       });
 
-      // ═══ COPY ═══
+      // ═══ COPY (updated with visual feedback) ═══
       async function copyPw(text) {
         try {
           await navigator.clipboard.writeText(text);
+          showToast("✅ Скопировано в буфер обмена");
         } catch {
           const ta = document.createElement("textarea");
           ta.value = text;
@@ -795,20 +1010,43 @@
           ta.select();
           document.execCommand("copy");
           document.body.removeChild(ta);
+          showToast("✅ Скопировано");
         }
       }
 
       document.getElementById("copyBtn").addEventListener("click", () => {
         const pw = passwordText.textContent;
-        if (pw && pw !== "-" && !pw.startsWith("Выберите")) copyPw(pw);
+        if (pw && pw !== "-" && !pw.startsWith("Выберите")) {
+          copyPw(pw);
+          const b = document.getElementById("copyBtn");
+          b.classList.add("copied");
+          b.textContent = "✓";
+          setTimeout(() => {
+            b.classList.remove("copied");
+            b.textContent = "📋";
+          }, 1500);
+        }
       });
 
       document
         .getElementById("refreshBtn")
         .addEventListener("click", updatePassword);
-      document
-        .getElementById("generateBtn")
-        .addEventListener("click", updatePassword);
+      document.getElementById("generateBtn").addEventListener("click", () => {
+        updatePassword();
+        const b = document.getElementById("generateBtn");
+        b.style.transform = "scale(0.97)";
+        setTimeout(() => (b.style.transform = ""), 150);
+      });
+
+      // ═══ NEW: TOAST ═══
+      let tt;
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(tt);
+        tt = setTimeout(() => t.classList.remove("show"), 2500);
+      }
 
       // ═══ INIT ═══
       updateSlider();
