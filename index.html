@@ -51,6 +51,7 @@
         --slider-track: #1a1a28;
         --checkbox-bg: #1a1a28;
         --toast-bg: #1a1a28;
+        --faq-bg: rgba(255, 255, 255, 0.02);
       }
 
       [data-theme="light"] {
@@ -79,6 +80,7 @@
         --slider-track: #ddd9d2;
         --checkbox-bg: #ddd9d2;
         --toast-bg: #1a1a2e;
+        --faq-bg: rgba(0, 0, 0, 0.02);
       }
 
       html {
@@ -97,7 +99,7 @@
         min-height: 100vh;
       }
 
-      /* NEW: NOISE OVERLAY */
+      /* NOISE */
       body::before {
         content: "";
         position: fixed;
@@ -152,6 +154,18 @@
         display: flex;
         align-items: center;
         gap: 1.5rem;
+      }
+
+      .nav-link {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: var(--accent);
       }
 
       /* THEME TOGGLE */
@@ -210,7 +224,7 @@
         opacity: 1;
       }
 
-      /* HERO */
+      /* HERO SECTION */
       .hero {
         min-height: 100vh;
         display: flex;
@@ -221,7 +235,7 @@
         position: relative;
       }
 
-      /* NEW: BACKGROUND ORBS */
+      /* BACKGROUND ORBS */
       .bg-orbs {
         position: fixed;
         inset: 0;
@@ -267,7 +281,7 @@
         }
       }
 
-      /* NEW: ENTRANCE ANIMATIONS */
+      /* HERO TEXT */
       .hero-badge {
         display: inline-flex;
         align-items: center;
@@ -371,9 +385,11 @@
         padding: 1rem 1.25rem;
         margin-bottom: 0.75rem;
         transition: all 0.3s;
+        position: relative;
       }
 
-      .password-display:hover {
+      .password-display:hover,
+      .password-display:focus-within {
         border-color: var(--accent);
         box-shadow: 0 0 0 3px var(--accent-glow);
       }
@@ -419,9 +435,11 @@
         border-color: var(--accent);
         transform: scale(1.05);
       }
+
       .icon-btn:active {
         transform: scale(0.95);
       }
+
       .icon-btn.copied {
         background: var(--green);
         border-color: var(--green);
@@ -457,16 +475,19 @@
         justify-content: space-between;
         align-items: center;
       }
+
       .strength-label {
         font-size: 0.8rem;
         font-weight: 600;
         transition: color 0.3s;
       }
+
       .strength-time {
         font-family: var(--font-mono);
         font-size: 0.75rem;
         color: var(--text-dim);
       }
+
       .strength-weak {
         color: var(--red);
       }
@@ -484,12 +505,14 @@
       .control-group {
         margin-bottom: 1.75rem;
       }
+
       .control-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.75rem;
       }
+
       .control-label {
         font-size: 0.9rem;
         font-weight: 500;
@@ -509,6 +532,11 @@
         min-width: 44px;
         text-align: center;
         transition: all var(--transition);
+      }
+
+      .slider-wrapper {
+        position: relative;
+        padding: 0.5rem 0;
       }
 
       input[type="range"] {
@@ -557,13 +585,14 @@
         margin-top: 0.35rem;
         padding: 0 2px;
       }
+
       .slider-marks span {
         font-family: var(--font-mono);
         font-size: 0.65rem;
         color: var(--text-muted);
       }
 
-      /* CHAR OPTIONS */
+      /* CHARACTER OPTIONS */
       .char-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -588,6 +617,7 @@
         border-color: var(--accent);
         background: var(--bg-card-hover);
       }
+
       .char-option.active {
         border-color: var(--accent);
         background: var(--accent-glow);
@@ -613,17 +643,20 @@
         border-color: var(--accent);
         color: #fff;
       }
+
       .char-option-text {
         display: flex;
         flex-direction: column;
         gap: 0.1rem;
       }
+
       .char-option-label {
         font-size: 0.88rem;
         font-weight: 500;
         color: var(--text);
         transition: color var(--transition);
       }
+
       .char-option-preview {
         font-family: var(--font-mono);
         font-size: 0.7rem;
@@ -649,24 +682,28 @@
         gap: 0.6rem;
         transition: all 0.3s;
         box-shadow: 0 4px 24px var(--accent-glow-strong);
+        letter-spacing: 0.01em;
       }
 
       .generate-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 32px var(--accent-glow-strong);
       }
+
       .generate-btn:active {
         transform: translateY(0) scale(0.98);
       }
+
       .generate-btn .spin {
         display: inline-block;
         transition: transform 0.4s;
       }
+
       .generate-btn:active .spin {
         transform: rotate(180deg);
       }
 
-      /* NEW: PASSWORD HISTORY */
+      /* PASSWORD HISTORY */
       .history-section {
         max-width: 620px;
         width: 100%;
@@ -680,6 +717,7 @@
         align-items: center;
         margin-bottom: 1rem;
       }
+
       .history-header h3 {
         font-size: 1rem;
         font-weight: 600;
@@ -695,6 +733,7 @@
         transition: color 0.3s;
         padding: 0.25rem 0.5rem;
       }
+
       .history-clear:hover {
         color: var(--red);
       }
@@ -716,6 +755,7 @@
         transition: all 0.3s;
         animation: fadeUp 0.3s ease both;
       }
+
       .history-item:hover {
         border-color: var(--accent);
       }
@@ -751,10 +791,155 @@
         transition: all 0.3s;
         flex-shrink: 0;
       }
+
       .history-copy:hover {
         background: var(--accent);
         color: #fff;
         border-color: var(--accent);
+      }
+
+      /* TIPS SECTION */
+      .tips-section {
+        max-width: 900px;
+        width: 100%;
+        padding: 5rem 1.5rem 3rem;
+        margin: 0 auto;
+      }
+
+      .tips-title {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.5rem;
+        text-align: center;
+      }
+
+      .tips-sub {
+        text-align: center;
+        color: var(--text-dim);
+        margin-bottom: 2.5rem;
+        font-size: 0.95rem;
+      }
+
+      .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .tip-card {
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        transition: all 0.4s;
+      }
+
+      .tip-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        box-shadow: var(--shadow);
+      }
+
+      .tip-icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+      .tip-card h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .tip-card p {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        line-height: 1.55;
+      }
+
+      /* FAQ */
+      .faq-section {
+        max-width: 700px;
+        width: 100%;
+        padding: 3rem 1.5rem 5rem;
+        margin: 0 auto;
+      }
+
+      .faq-title {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .faq-item {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        background: var(--faq-bg);
+        transition: all 0.3s;
+      }
+
+      .faq-item:hover {
+        border-color: var(--border-strong);
+      }
+
+      .faq-question {
+        width: 100%;
+        padding: 1.25rem 1.5rem;
+        background: none;
+        border: none;
+        color: var(--text);
+        font-family: var(--font-main);
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        transition: color var(--transition);
+      }
+
+      .faq-question .arrow {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        transition: transform 0.3s;
+        flex-shrink: 0;
+      }
+
+      .faq-item.open .faq-question .arrow {
+        transform: rotate(180deg);
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s var(--ease);
+      }
+
+      .faq-item.open .faq-answer {
+        max-height: 300px;
+      }
+
+      .faq-answer-inner {
+        padding: 0 1.5rem 1.25rem;
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        line-height: 1.65;
+      }
+
+      /* FOOTER */
+      .footer {
+        text-align: center;
+        padding: 2rem 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        transition: border var(--transition);
       }
 
       /* TOAST */
@@ -776,38 +961,19 @@
         pointer-events: none;
         backdrop-filter: blur(10px);
       }
+
       .toast.show {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
-      }
-
-      /* FOOTER */
-      .footer {
-        text-align: center;
-        padding: 2rem 1.5rem;
-        border-top: 1px solid var(--border);
-        color: var(--text-muted);
-        font-size: 0.8rem;
-        transition: border var(--transition);
-      }
-
-      /* NEW: SCROLL REVEAL */
-      .reveal {
-        opacity: 0;
-        transform: translateY(25px);
-        transition:
-          opacity 0.7s ease,
-          transform 0.7s ease;
-      }
-      .reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
       }
 
       /* RESPONSIVE */
       @media (max-width: 640px) {
         .nav {
           padding: 0.875rem 1.25rem;
+        }
+        .nav-link.hide-mobile {
+          display: none;
         }
         .hero {
           padding: 6rem 1rem 2.5rem;
@@ -822,11 +988,28 @@
         .char-options {
           grid-template-columns: 1fr;
         }
+        .tips-grid {
+          grid-template-columns: 1fr;
+        }
         .history-meta {
           display: none;
         }
       }
 
+      /* REVEAL */
+      .reveal {
+        opacity: 0;
+        transform: translateY(25px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* SLIDER FILL */
       input[type="range"].styled {
         background: linear-gradient(
           to right,
@@ -852,7 +1035,6 @@
     </style>
   </head>
   <body>
-    <!-- NEW: Background orbs -->
     <div class="bg-orbs">
       <div class="orb orb-1"></div>
       <div class="orb orb-2"></div>
@@ -865,6 +1047,8 @@
         PassForge
       </a>
       <div class="nav-right">
+        <a href="#tips" class="nav-link hide-mobile">Советы</a>
+        <a href="#faq" class="nav-link hide-mobile">FAQ</a>
         <button
           class="theme-toggle"
           id="themeToggle"
@@ -967,13 +1151,128 @@
         </button>
       </div>
 
-      <!-- NEW: History section -->
       <div class="history-section" id="historySection" style="display: none">
         <div class="history-header">
           <h3>📝 История</h3>
           <button class="history-clear" id="clearHistory">Очистить</button>
         </div>
         <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+
+    <!-- TIPS -->
+    <section class="tips-section reveal" id="tips">
+      <h2 class="tips-title">Советы по безопасности</h2>
+      <p class="tips-sub">Как защитить свои учётные записи</p>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <span class="tip-icon">🎲</span>
+          <h4>Уникальность</h4>
+          <p>
+            Используйте отдельный пароль для каждого сервиса. Утечка одного не
+            должна компрометировать остальные аккаунты.
+          </p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">📏</span>
+          <h4>Длина важнее</h4>
+          <p>
+            Пароль из 16+ символов значительно надёжнее короткого сложного.
+            Каждый символ экспоненциально увеличивает время подбора.
+          </p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">🔑</span>
+          <h4>Менеджер паролей</h4>
+          <p>
+            Используйте менеджер паролей (Bitwarden, 1Password, KeePass) для
+            безопасного хранения сложных уникальных паролей.
+          </p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">📱</span>
+          <h4>2FA везде</h4>
+          <p>
+            Включите двухфакторную аутентификацию на всех важных аккаунтах. Даже
+            утечка пароля не даст злоумышленнику доступ.
+          </p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">🚫</span>
+          <h4>Без личных данных</h4>
+          <p>
+            Не используйте в паролях имена, даты рождения, клички питомцев -
+            информацию, которую можно найти в соцсетях.
+          </p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">🔄</span>
+          <h4>Проверяйте утечки</h4>
+          <p>
+            Регулярно проверяйте email-адреса на Have I Been Pwned и меняйте
+            пароли к скомпрометированным аккаунтам.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section reveal" id="faq">
+      <h2 class="faq-title">Частые вопросы</h2>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Безопасен ли этот генератор?
+          <span class="arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Да. Генератор работает полностью в вашем браузере на JavaScript.
+            Пароли создаются с помощью криптографически стойкого генератора
+            случайных чисел (crypto.getRandomValues). Никакие данные не
+            отправляются на сервер.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Какая длина пароля считается надёжной?
+          <span class="arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Рекомендуется не менее 12 символов, а для критически важных
+            аккаунтов - 16 и более. Пароль из 16 символов со всеми типами
+            символов потребует триллионы лет для подбора методом полного
+            перебора.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Зачем генератор, если можно придумать самому?
+          <span class="arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Люди склонны создавать предсказуемые пароли из реальных слов, дат и
+            шаблонов. Генератор создаёт действительно случайные комбинации,
+            которые невозможно угадать или подобрать по словарю.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Сохраняются ли мои пароли?
+          <span class="arrow">▼</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            История паролей хранится только в текущей сессии и исчезает при
+            закрытии страницы. Мы не используем cookies, localStorage или
+            серверное хранение для паролей. Сохраняйте их в надёжный менеджер
+            паролей.
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1025,6 +1324,7 @@
         if (!active.length) return "";
 
         active.forEach(([key]) => (charset += CHARS[key]));
+
         const array = new Uint32Array(state.length);
         crypto.getRandomValues(array);
 
@@ -1036,8 +1336,9 @@
           password[i] = set[r[0] % set.length];
         });
 
-        for (let i = active.length; i < state.length; i++)
+        for (let i = active.length; i < state.length; i++) {
           password[i] = charset[array[i] % charset.length];
+        }
 
         for (let i = password.length - 1; i > 0; i--) {
           const r = new Uint32Array(1);
@@ -1045,12 +1346,14 @@
           const j = r[0] % (i + 1);
           [password[i], password[j]] = [password[j], password[i]];
         }
+
         return password.join("");
       }
 
       // ═══ STRENGTH ═══
       function calcStrength(pw) {
         if (!pw) return { level: 0, label: "-", time: "", cls: "" };
+
         let pool = 0;
         if (/[a-z]/.test(pw)) pool += 26;
         if (/[A-Z]/.test(pw)) pool += 26;
@@ -1135,7 +1438,6 @@
         addHistory(pw);
       }
 
-      // ═══ NEW: HISTORY ═══
       function addHistory(pw) {
         state.history.unshift({
           pw,
@@ -1173,12 +1475,6 @@
           })
           .join("");
       }
-
-      document.getElementById("clearHistory").addEventListener("click", () => {
-        state.history = [];
-        renderHistory();
-        showToast("🗑️ История очищена");
-      });
 
       // ═══ SLIDER ═══
       function updateSlider() {
@@ -1256,6 +1552,12 @@
         setTimeout(() => (b.style.transform = ""), 150);
       });
 
+      document.getElementById("clearHistory").addEventListener("click", () => {
+        state.history = [];
+        renderHistory();
+        showToast("🗑️ История очищена");
+      });
+
       // ═══ TOAST ═══
       let tt;
       function showToast(msg) {
@@ -1266,7 +1568,17 @@
         tt = setTimeout(() => t.classList.remove("show"), 2500);
       }
 
-      // ═══ NEW: SCROLL REVEAL ═══
+      // ═══ FAQ ═══
+      function toggleFaq(btn) {
+        const item = btn.parentElement;
+        const open = item.classList.contains("open");
+        document
+          .querySelectorAll(".faq-item")
+          .forEach((i) => i.classList.remove("open"));
+        if (!open) item.classList.add("open");
+      }
+
+      // ═══ REVEAL ═══
       const obs = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
@@ -1277,7 +1589,7 @@
       );
       document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
 
-      // ═══ NEW: KEYBOARD SHORTCUT ═══
+      // ═══ KEYBOARD ═══
       document.addEventListener("keydown", (e) => {
         if (e.key === " " && e.target === document.body) {
           e.preventDefault();
