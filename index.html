@@ -97,6 +97,17 @@
         min-height: 100vh;
       }
 
+      /* NEW: NOISE OVERLAY */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
       /* NAV */
       .nav {
         position: fixed;
@@ -210,6 +221,53 @@
         position: relative;
       }
 
+      /* NEW: BACKGROUND ORBS */
+      .bg-orbs {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+      }
+
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        animation: orbDrift 25s ease-in-out infinite;
+      }
+
+      .orb-1 {
+        width: 600px;
+        height: 600px;
+        background: var(--accent-glow);
+        top: -15%;
+        right: -10%;
+      }
+
+      .orb-2 {
+        width: 450px;
+        height: 450px;
+        background: var(--green-glow);
+        bottom: -10%;
+        left: -8%;
+        animation-delay: -10s;
+      }
+
+      @keyframes orbDrift {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(25px, -25px) scale(1.04);
+        }
+        66% {
+          transform: translate(-15px, 15px) scale(0.96);
+        }
+      }
+
+      /* NEW: ENTRANCE ANIMATIONS */
       .hero-badge {
         display: inline-flex;
         align-items: center;
@@ -223,6 +281,7 @@
         color: var(--accent-light);
         margin-bottom: 1.5rem;
         backdrop-filter: blur(10px);
+        animation: fadeUp 0.6s ease both;
       }
 
       .hero-title {
@@ -232,6 +291,7 @@
         letter-spacing: -0.04em;
         line-height: 1.1;
         margin-bottom: 1rem;
+        animation: fadeUp 0.6s 0.1s ease both;
       }
 
       .hero-title .glow {
@@ -252,6 +312,18 @@
         font-size: clamp(0.95rem, 2vw, 1.15rem);
         max-width: 520px;
         margin-bottom: 3rem;
+        animation: fadeUp 0.6s 0.2s ease both;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* GENERATOR CARD */
@@ -269,6 +341,7 @@
           background var(--transition),
           border var(--transition),
           box-shadow var(--transition);
+        animation: fadeUp 0.6s 0.3s ease both;
       }
 
       .generator::before {
@@ -346,11 +419,9 @@
         border-color: var(--accent);
         transform: scale(1.05);
       }
-
       .icon-btn:active {
         transform: scale(0.95);
       }
-
       .icon-btn.copied {
         background: var(--green);
         border-color: var(--green);
@@ -386,19 +457,16 @@
         justify-content: space-between;
         align-items: center;
       }
-
       .strength-label {
         font-size: 0.8rem;
         font-weight: 600;
         transition: color 0.3s;
       }
-
       .strength-time {
         font-family: var(--font-mono);
         font-size: 0.75rem;
         color: var(--text-dim);
       }
-
       .strength-weak {
         color: var(--red);
       }
@@ -416,14 +484,12 @@
       .control-group {
         margin-bottom: 1.75rem;
       }
-
       .control-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.75rem;
       }
-
       .control-label {
         font-size: 0.9rem;
         font-weight: 500;
@@ -491,7 +557,6 @@
         margin-top: 0.35rem;
         padding: 0 2px;
       }
-
       .slider-marks span {
         font-family: var(--font-mono);
         font-size: 0.65rem;
@@ -523,7 +588,6 @@
         border-color: var(--accent);
         background: var(--bg-card-hover);
       }
-
       .char-option.active {
         border-color: var(--accent);
         background: var(--accent-glow);
@@ -549,20 +613,17 @@
         border-color: var(--accent);
         color: #fff;
       }
-
       .char-option-text {
         display: flex;
         flex-direction: column;
         gap: 0.1rem;
       }
-
       .char-option-label {
         font-size: 0.88rem;
         font-weight: 500;
         color: var(--text);
         transition: color var(--transition);
       }
-
       .char-option-preview {
         font-family: var(--font-mono);
         font-size: 0.7rem;
@@ -594,18 +655,106 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 32px var(--accent-glow-strong);
       }
-
       .generate-btn:active {
         transform: translateY(0) scale(0.98);
       }
-
       .generate-btn .spin {
         display: inline-block;
         transition: transform 0.4s;
       }
-
       .generate-btn:active .spin {
         transform: rotate(180deg);
+      }
+
+      /* NEW: PASSWORD HISTORY */
+      .history-section {
+        max-width: 620px;
+        width: 100%;
+        margin-top: 2.5rem;
+        animation: fadeUp 0.6s 0.5s ease both;
+      }
+
+      .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .history-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .history-clear {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s;
+        padding: 0.25rem 0.5rem;
+      }
+      .history-clear:hover {
+        color: var(--red);
+      }
+
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .history-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: all 0.3s;
+        animation: fadeUp 0.3s ease both;
+      }
+      .history-item:hover {
+        border-color: var(--accent);
+      }
+
+      .history-pw {
+        flex: 1;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--text);
+        word-break: break-all;
+        transition: color var(--transition);
+      }
+
+      .history-meta {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+
+      .history-copy {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+      .history-copy:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
       }
 
       /* TOAST */
@@ -627,7 +776,6 @@
         pointer-events: none;
         backdrop-filter: blur(10px);
       }
-
       .toast.show {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
@@ -641,6 +789,19 @@
         color: var(--text-muted);
         font-size: 0.8rem;
         transition: border var(--transition);
+      }
+
+      /* NEW: SCROLL REVEAL */
+      .reveal {
+        opacity: 0;
+        transform: translateY(25px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       /* RESPONSIVE */
@@ -660,6 +821,9 @@
         }
         .char-options {
           grid-template-columns: 1fr;
+        }
+        .history-meta {
+          display: none;
         }
       }
 
@@ -688,6 +852,12 @@
     </style>
   </head>
   <body>
+    <!-- NEW: Background orbs -->
+    <div class="bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
     <!-- NAV -->
     <nav class="nav">
       <a href="#" class="nav-logo">
@@ -730,7 +900,6 @@
           </div>
         </div>
 
-        <!-- NEW: Strength indicator -->
         <div class="strength-section">
           <div class="strength-bar-track">
             <div class="strength-bar-fill" id="strengthFill"></div>
@@ -797,6 +966,15 @@
           <span class="spin">⚡</span> Сгенерировать пароль
         </button>
       </div>
+
+      <!-- NEW: History section -->
+      <div class="history-section" id="historySection" style="display: none">
+        <div class="history-header">
+          <h3>📝 История</h3>
+          <button class="history-clear" id="clearHistory">Очистить</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
     </section>
 
     <footer class="footer">
@@ -806,7 +984,6 @@
       </p>
     </footer>
 
-    <!-- NEW: Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -838,6 +1015,7 @@
           numbers: true,
           symbols: true,
         },
+        history: [],
       };
 
       // ═══ GENERATE ═══
@@ -847,7 +1025,6 @@
         if (!active.length) return "";
 
         active.forEach(([key]) => (charset += CHARS[key]));
-
         const array = new Uint32Array(state.length);
         crypto.getRandomValues(array);
 
@@ -859,9 +1036,8 @@
           password[i] = set[r[0] % set.length];
         });
 
-        for (let i = active.length; i < state.length; i++) {
+        for (let i = active.length; i < state.length; i++)
           password[i] = charset[array[i] % charset.length];
-        }
 
         for (let i = password.length - 1; i > 0; i--) {
           const r = new Uint32Array(1);
@@ -869,14 +1045,12 @@
           const j = r[0] % (i + 1);
           [password[i], password[j]] = [password[j], password[i]];
         }
-
         return password.join("");
       }
 
-      // ═══ NEW: STRENGTH CALCULATION ═══
+      // ═══ STRENGTH ═══
       function calcStrength(pw) {
         if (!pw) return { level: 0, label: "-", time: "", cls: "" };
-
         let pool = 0;
         if (/[a-z]/.test(pw)) pool += 26;
         if (/[A-Z]/.test(pw)) pool += 26;
@@ -952,15 +1126,59 @@
           return;
         }
         passwordText.textContent = pw;
-
-        // NEW: Update strength indicator
         const s = calcStrength(pw);
         strengthFill.style.width = s.level + "%";
         strengthFill.style.background = barColors[s.cls] || "var(--accent)";
         strengthLabel.textContent = s.label;
         strengthLabel.className = "strength-label " + s.cls;
         strengthTime.textContent = s.time;
+        addHistory(pw);
       }
+
+      // ═══ NEW: HISTORY ═══
+      function addHistory(pw) {
+        state.history.unshift({
+          pw,
+          len: pw.length,
+          time: new Date().toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        });
+        if (state.history.length > 8) state.history.pop();
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const sec = document.getElementById("historySection");
+        const list = document.getElementById("historyList");
+        if (!state.history.length) {
+          sec.style.display = "none";
+          return;
+        }
+        sec.style.display = "block";
+        list.innerHTML = state.history
+          .map((h, i) => {
+            const safe = h.pw
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;");
+            const jsafe = h.pw.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+            return `<div class="history-item" style="animation-delay:${i * 0.05}s">
+      <span class="history-pw">${safe}</span>
+      <span class="history-meta">${h.len} симв · ${h.time}</span>
+      <button class="history-copy" onclick="copyPw('${jsafe}')" title="Копировать">📋</button>
+    </div>`;
+          })
+          .join("");
+      }
+
+      document.getElementById("clearHistory").addEventListener("click", () => {
+        state.history = [];
+        renderHistory();
+        showToast("🗑️ История очищена");
+      });
 
       // ═══ SLIDER ═══
       function updateSlider() {
@@ -980,7 +1198,7 @@
         updatePassword();
       });
 
-      // ═══ CHAR OPTIONS (updated with shake animation) ═══
+      // ═══ CHAR OPTIONS ═══
       document.querySelectorAll(".char-option").forEach((el) => {
         el.addEventListener("click", () => {
           const t = el.dataset.type;
@@ -997,7 +1215,7 @@
         });
       });
 
-      // ═══ COPY (updated with visual feedback) ═══
+      // ═══ COPY ═══
       async function copyPw(text) {
         try {
           await navigator.clipboard.writeText(text);
@@ -1038,7 +1256,7 @@
         setTimeout(() => (b.style.transform = ""), 150);
       });
 
-      // ═══ NEW: TOAST ═══
+      // ═══ TOAST ═══
       let tt;
       function showToast(msg) {
         const t = document.getElementById("toast");
@@ -1047,6 +1265,25 @@
         clearTimeout(tt);
         tt = setTimeout(() => t.classList.remove("show"), 2500);
       }
+
+      // ═══ NEW: SCROLL REVEAL ═══
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("visible");
+          });
+        },
+        { threshold: 0.1 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+
+      // ═══ NEW: KEYBOARD SHORTCUT ═══
+      document.addEventListener("keydown", (e) => {
+        if (e.key === " " && e.target === document.body) {
+          e.preventDefault();
+          updatePassword();
+        }
+      });
 
       // ═══ INIT ═══
       updateSlider();
