@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-theme="dark">
+<html lang="ru" data-theme="dark" data-lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -166,6 +166,37 @@
 
       .nav-link:hover {
         color: var(--accent);
+      }
+
+      /* LANG TOGGLE */
+      .lang-toggle {
+        display: flex;
+        background: var(--toggle-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition:
+          background var(--transition),
+          border var(--transition);
+      }
+      .lang-btn {
+        padding: 0.3rem 0.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.02em;
+      }
+      .lang-btn.active {
+        background: var(--accent);
+        color: #fff;
+      }
+      .lang-btn:not(.active):hover {
+        color: var(--text);
       }
 
       /* THEME TOGGLE */
@@ -1047,8 +1078,18 @@
         PassForge
       </a>
       <div class="nav-right">
-        <a href="#tips" class="nav-link hide-mobile">Советы</a>
-        <a href="#faq" class="nav-link hide-mobile">FAQ</a>
+        <a href="#tips" class="nav-link hide-mobile" data-i18n="nav_tips"
+          >Советы</a
+        >
+        <a href="#faq" class="nav-link hide-mobile" data-i18n="nav_faq">FAQ</a>
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="langRu" onclick="setLang('ru')">
+            RU
+          </button>
+          <button class="lang-btn" id="langEn" onclick="setLang('en')">
+            EN
+          </button>
+        </div>
         <button
           class="theme-toggle"
           id="themeToggle"
@@ -1062,11 +1103,13 @@
 
     <!-- HERO + GENERATOR -->
     <section class="hero">
-      <div class="hero-badge">🛡️ Безопасно · Локально · Бесплатно</div>
-      <h1 class="hero-title">
+      <div class="hero-badge" data-i18n="hero_badge">
+        🛡️ Безопасно · Локально · Бесплатно
+      </div>
+      <h1 class="hero-title" data-i18n-html="hero_title">
         Генератор<br /><span class="glow">надёжных паролей</span>
       </h1>
-      <p class="hero-sub">
+      <p class="hero-sub" data-i18n="hero_sub">
         Создавайте криптостойкие пароли прямо в браузере. Никакие данные не
         отправляются на сервер.
       </p>
@@ -1096,7 +1139,9 @@
 
         <div class="control-group">
           <div class="control-header">
-            <span class="control-label">Длина пароля</span>
+            <span class="control-label" data-i18n="length_label"
+              >Длина пароля</span
+            >
             <span class="control-value" id="lengthValue">16</span>
           </div>
           <div class="slider-wrapper">
@@ -1119,42 +1164,57 @@
           <div class="char-option active" data-type="uppercase">
             <div class="char-checkbox">✓</div>
             <div class="char-option-text">
-              <span class="char-option-label">Заглавные</span>
+              <span class="char-option-label" data-i18n="opt_upper"
+                >Заглавные</span
+              >
               <span class="char-option-preview">A B C D E F</span>
             </div>
           </div>
           <div class="char-option active" data-type="lowercase">
             <div class="char-checkbox">✓</div>
             <div class="char-option-text">
-              <span class="char-option-label">Строчные</span>
+              <span class="char-option-label" data-i18n="opt_lower"
+                >Строчные</span
+              >
               <span class="char-option-preview">a b c d e f</span>
             </div>
           </div>
           <div class="char-option active" data-type="numbers">
             <div class="char-checkbox">✓</div>
             <div class="char-option-text">
-              <span class="char-option-label">Цифры</span>
+              <span class="char-option-label" data-i18n="opt_digits"
+                >Цифры</span
+              >
               <span class="char-option-preview">0 1 2 3 4 5</span>
             </div>
           </div>
           <div class="char-option active" data-type="symbols">
             <div class="char-checkbox">✓</div>
             <div class="char-option-text">
-              <span class="char-option-label">Символы</span>
+              <span class="char-option-label" data-i18n="opt_symbols"
+                >Символы</span
+              >
               <span class="char-option-preview">! @ # $ % &</span>
             </div>
           </div>
         </div>
 
         <button class="generate-btn" id="generateBtn">
-          <span class="spin">⚡</span> Сгенерировать пароль
+          <span class="spin">⚡</span>
+          <span data-i18n="btn_generate">Сгенерировать пароль</span>
         </button>
       </div>
 
       <div class="history-section" id="historySection" style="display: none">
         <div class="history-header">
-          <h3>📝 История</h3>
-          <button class="history-clear" id="clearHistory">Очистить</button>
+          <h3 data-i18n="history_title">📝 История</h3>
+          <button
+            class="history-clear"
+            id="clearHistory"
+            data-i18n="history_clear"
+          >
+            Очистить
+          </button>
         </div>
         <div class="history-list" id="historyList"></div>
       </div>
@@ -1162,53 +1222,55 @@
 
     <!-- TIPS -->
     <section class="tips-section reveal" id="tips">
-      <h2 class="tips-title">Советы по безопасности</h2>
-      <p class="tips-sub">Как защитить свои учётные записи</p>
+      <h2 class="tips-title" data-i18n="tips_title">Советы по безопасности</h2>
+      <p class="tips-sub" data-i18n="tips_sub">
+        Как защитить свои учётные записи
+      </p>
       <div class="tips-grid">
         <div class="tip-card">
           <span class="tip-icon">🎲</span>
-          <h4>Уникальность</h4>
-          <p>
+          <h4 data-i18n="tip1_t">Уникальность</h4>
+          <p data-i18n="tip1_d">
             Используйте отдельный пароль для каждого сервиса. Утечка одного не
             должна компрометировать остальные аккаунты.
           </p>
         </div>
         <div class="tip-card">
           <span class="tip-icon">📏</span>
-          <h4>Длина важнее</h4>
-          <p>
+          <h4 data-i18n="tip2_t">Длина важнее</h4>
+          <p data-i18n="tip2_d">
             Пароль из 16+ символов значительно надёжнее короткого сложного.
             Каждый символ экспоненциально увеличивает время подбора.
           </p>
         </div>
         <div class="tip-card">
           <span class="tip-icon">🔑</span>
-          <h4>Менеджер паролей</h4>
-          <p>
+          <h4 data-i18n="tip3_t">Менеджер паролей</h4>
+          <p data-i18n="tip3_d">
             Используйте менеджер паролей (Bitwarden, 1Password, KeePass) для
             безопасного хранения сложных уникальных паролей.
           </p>
         </div>
         <div class="tip-card">
           <span class="tip-icon">📱</span>
-          <h4>2FA везде</h4>
-          <p>
+          <h4 data-i18n="tip4_t">2FA везде</h4>
+          <p data-i18n="tip4_d">
             Включите двухфакторную аутентификацию на всех важных аккаунтах. Даже
             утечка пароля не даст злоумышленнику доступ.
           </p>
         </div>
         <div class="tip-card">
           <span class="tip-icon">🚫</span>
-          <h4>Без личных данных</h4>
-          <p>
+          <h4 data-i18n="tip5_t">Без личных данных</h4>
+          <p data-i18n="tip5_d">
             Не используйте в паролях имена, даты рождения, клички питомцев -
             информацию, которую можно найти в соцсетях.
           </p>
         </div>
         <div class="tip-card">
           <span class="tip-icon">🔄</span>
-          <h4>Проверяйте утечки</h4>
-          <p>
+          <h4 data-i18n="tip6_t">Проверяйте утечки</h4>
+          <p data-i18n="tip6_d">
             Регулярно проверяйте email-адреса на Have I Been Pwned и меняйте
             пароли к скомпрометированным аккаунтам.
           </p>
@@ -1218,14 +1280,14 @@
 
     <!-- FAQ -->
     <section class="faq-section reveal" id="faq">
-      <h2 class="faq-title">Частые вопросы</h2>
+      <h2 class="faq-title" data-i18n="faq_title">Частые вопросы</h2>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">
-          Безопасен ли этот генератор?
-          <span class="arrow">▼</span>
+          <span data-i18n="faq1_q">Безопасен ли этот генератор?</span
+          ><span class="arrow">▼</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">
+          <div class="faq-answer-inner" data-i18n="faq1_a">
             Да. Генератор работает полностью в вашем браузере на JavaScript.
             Пароли создаются с помощью криптографически стойкого генератора
             случайных чисел (crypto.getRandomValues). Никакие данные не
@@ -1235,11 +1297,11 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">
-          Какая длина пароля считается надёжной?
-          <span class="arrow">▼</span>
+          <span data-i18n="faq2_q">Какая длина пароля считается надёжной?</span
+          ><span class="arrow">▼</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">
+          <div class="faq-answer-inner" data-i18n="faq2_a">
             Рекомендуется не менее 12 символов, а для критически важных
             аккаунтов - 16 и более. Пароль из 16 символов со всеми типами
             символов потребует триллионы лет для подбора методом полного
@@ -1249,11 +1311,12 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">
-          Зачем генератор, если можно придумать самому?
-          <span class="arrow">▼</span>
+          <span data-i18n="faq3_q"
+            >Зачем генератор, если можно придумать самому?</span
+          ><span class="arrow">▼</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">
+          <div class="faq-answer-inner" data-i18n="faq3_a">
             Люди склонны создавать предсказуемые пароли из реальных слов, дат и
             шаблонов. Генератор создаёт действительно случайные комбинации,
             которые невозможно угадать или подобрать по словарю.
@@ -1262,11 +1325,11 @@
       </div>
       <div class="faq-item">
         <button class="faq-question" onclick="toggleFaq(this)">
-          Сохраняются ли мои пароли?
-          <span class="arrow">▼</span>
+          <span data-i18n="faq4_q">Сохраняются ли мои пароли?</span
+          ><span class="arrow">▼</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">
+          <div class="faq-answer-inner" data-i18n="faq4_a">
             История паролей хранится только в текущей сессии и исчезает при
             закрытии страницы. Мы не используем cookies, localStorage или
             серверное хранение для паролей. Сохраняйте их в надёжный менеджер
@@ -1277,7 +1340,7 @@
     </section>
 
     <footer class="footer">
-      <p>
+      <p data-i18n="footer">
         PassForge © 2026 - Генератор паролей. Работает полностью в вашем
         браузере.
       </p>
@@ -1286,10 +1349,193 @@
     <div class="toast" id="toast"></div>
 
     <script>
+      // ═══════════════════════════════════════
+      // i18n TRANSLATIONS
+      // ═══════════════════════════════════════
+      const i18n = {
+        ru: {
+          nav_tips: "Советы",
+          nav_faq: "FAQ",
+          hero_badge: "🛡️ Безопасно · Локально · Бесплатно",
+          hero_title: 'Генератор<br><span class="glow">надёжных паролей</span>',
+          hero_sub:
+            "Создавайте криптостойкие пароли прямо в браузере. Никакие данные не отправляются на сервер.",
+          length_label: "Длина пароля",
+          opt_upper: "Заглавные",
+          opt_lower: "Строчные",
+          opt_digits: "Цифры",
+          opt_symbols: "Символы",
+          btn_generate: "Сгенерировать пароль",
+          history_title: "📝 История",
+          history_clear: "Очистить",
+          history_chars: "симв",
+          s_vweak: "Очень слабый",
+          s_weak: "Слабый",
+          s_good: "Хороший",
+          s_strong: "Сильный",
+          s_excellent: "Отличный",
+          s_crack: "взлом",
+          s_instant: "мгновенно",
+          s_sec: "сек",
+          s_min: "мин",
+          s_h: "ч",
+          s_d: "дн",
+          s_y: "лет",
+          t_copied: "✅ Скопировано в буфер обмена",
+          t_copied2: "✅ Скопировано",
+          t_cleared: "🗑️ История очищена",
+          t_mintype: "⚠️ Нужен хотя бы один тип символов",
+          pw_empty: "Выберите хотя бы один тип",
+          copy_tip: "Скопировать",
+          refresh_tip: "Новый пароль",
+          tips_title: "Советы по безопасности",
+          tips_sub: "Как защитить свои учётные записи",
+          tip1_t: "Уникальность",
+          tip1_d:
+            "Используйте отдельный пароль для каждого сервиса. Утечка одного не должна компрометировать остальные аккаунты.",
+          tip2_t: "Длина важнее",
+          tip2_d:
+            "Пароль из 16+ символов значительно надёжнее короткого сложного. Каждый символ экспоненциально увеличивает время подбора.",
+          tip3_t: "Менеджер паролей",
+          tip3_d:
+            "Используйте менеджер паролей (Bitwarden, 1Password, KeePass) для безопасного хранения сложных уникальных паролей.",
+          tip4_t: "2FA везде",
+          tip4_d:
+            "Включите двухфакторную аутентификацию на всех важных аккаунтах. Даже утечка пароля не даст злоумышленнику доступ.",
+          tip5_t: "Без личных данных",
+          tip5_d:
+            "Не используйте в паролях имена, даты рождения, клички питомцев - информацию, которую можно найти в соцсетях.",
+          tip6_t: "Проверяйте утечки",
+          tip6_d:
+            "Регулярно проверяйте email-адреса на Have I Been Pwned и меняйте пароли к скомпрометированным аккаунтам.",
+          faq_title: "Частые вопросы",
+          faq1_q: "Безопасен ли этот генератор?",
+          faq1_a:
+            "Да. Генератор работает полностью в вашем браузере на JavaScript. Пароли создаются с помощью криптографически стойкого генератора случайных чисел (crypto.getRandomValues). Никакие данные не отправляются на сервер.",
+          faq2_q: "Какая длина пароля считается надёжной?",
+          faq2_a:
+            "Рекомендуется не менее 12 символов, а для критически важных аккаунтов - 16 и более. Пароль из 16 символов со всеми типами символов потребует триллионы лет для подбора методом полного перебора.",
+          faq3_q: "Зачем генератор, если можно придумать самому?",
+          faq3_a:
+            "Люди склонны создавать предсказуемые пароли из реальных слов, дат и шаблонов. Генератор создаёт действительно случайные комбинации, которые невозможно угадать или подобрать по словарю.",
+          faq4_q: "Сохраняются ли мои пароли?",
+          faq4_a:
+            "История паролей хранится только в текущей сессии и исчезает при закрытии страницы. Мы не используем cookies, localStorage или серверное хранение для паролей. Сохраняйте их в надёжный менеджер паролей.",
+          footer:
+            "PassForge © 2026 - Генератор паролей. Работает полностью в вашем браузере.",
+          page_title: "PassForge - Генератор надёжных паролей",
+        },
+        en: {
+          nav_tips: "Tips",
+          nav_faq: "FAQ",
+          hero_badge: "🛡️ Secure · Local · Free",
+          hero_title: 'Password<br><span class="glow">Generator</span>',
+          hero_sub:
+            "Create cryptographically strong passwords right in your browser. No data is ever sent to any server.",
+          length_label: "Password length",
+          opt_upper: "Uppercase",
+          opt_lower: "Lowercase",
+          opt_digits: "Digits",
+          opt_symbols: "Symbols",
+          btn_generate: "Generate password",
+          history_title: "📝 History",
+          history_clear: "Clear",
+          history_chars: "chars",
+          s_vweak: "Very weak",
+          s_weak: "Weak",
+          s_good: "Good",
+          s_strong: "Strong",
+          s_excellent: "Excellent",
+          s_crack: "crack",
+          s_instant: "instantly",
+          s_sec: "sec",
+          s_min: "min",
+          s_h: "h",
+          s_d: "d",
+          s_y: "yrs",
+          t_copied: "✅ Copied to clipboard",
+          t_copied2: "✅ Copied",
+          t_cleared: "🗑️ History cleared",
+          t_mintype: "⚠️ At least one character type required",
+          pw_empty: "Select at least one type",
+          copy_tip: "Copy",
+          refresh_tip: "New password",
+          tips_title: "Security Tips",
+          tips_sub: "How to protect your accounts",
+          tip1_t: "Uniqueness",
+          tip1_d:
+            "Use a separate password for every service. A single leak should not compromise all your accounts.",
+          tip2_t: "Length matters",
+          tip2_d:
+            "A 16+ character password is far stronger than a short complex one. Each extra character exponentially increases crack time.",
+          tip3_t: "Password manager",
+          tip3_d:
+            "Use a password manager (Bitwarden, 1Password, KeePass) to securely store complex unique passwords.",
+          tip4_t: "2FA everywhere",
+          tip4_d:
+            "Enable two-factor authentication on all important accounts. Even a leaked password won't grant an attacker access.",
+          tip5_t: "No personal data",
+          tip5_d:
+            "Don't use names, birthdays, or pet names in passwords - information that can be found on social media.",
+          tip6_t: "Check for breaches",
+          tip6_d:
+            "Regularly check your emails on Have I Been Pwned and change passwords for compromised accounts.",
+          faq_title: "FAQ",
+          faq1_q: "Is this generator safe?",
+          faq1_a:
+            "Yes. It runs entirely in your browser via JavaScript. Passwords are created using the cryptographically secure crypto.getRandomValues API. No data is ever sent to any server.",
+          faq2_q: "What password length is secure?",
+          faq2_a:
+            "At least 12 characters is recommended, and 16+ for critical accounts. A 16-character password with all character types would take trillions of years to brute-force.",
+          faq3_q: "Why not just make one up myself?",
+          faq3_a:
+            "Humans tend to create predictable passwords from real words, dates, and patterns. A generator creates truly random combinations that can't be guessed or dictionary-attacked.",
+          faq4_q: "Are my passwords stored?",
+          faq4_a:
+            "Password history only lives in the current session and disappears when you close the page. We don't use cookies, localStorage, or server storage for your passwords. Save them in a reliable password manager.",
+          footer:
+            "PassForge © 2026 - Password Generator. Runs entirely in your browser.",
+          page_title: "PassForge - Secure Password Generator",
+        },
+      };
+
+      let curLang = localStorage.getItem("passforge-lang") || "ru";
+      function t(k) {
+        return i18n[curLang]?.[k] || i18n.ru[k] || k;
+      }
+
+      function applyLang() {
+        document.documentElement.setAttribute("data-lang", curLang);
+        document.documentElement.setAttribute("lang", curLang);
+        document.title = t("page_title");
+        document
+          .getElementById("langRu")
+          .classList.toggle("active", curLang === "ru");
+        document
+          .getElementById("langEn")
+          .classList.toggle("active", curLang === "en");
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+        document.getElementById("copyBtn").title = t("copy_tip");
+        document.getElementById("refreshBtn").title = t("refresh_tip");
+        refreshStrength();
+        renderHistory();
+      }
+
+      function setLang(lang) {
+        curLang = lang;
+        localStorage.setItem("passforge-lang", lang);
+        applyLang();
+      }
+
       // ═══ THEME ═══
       const html = document.documentElement;
-      const saved = localStorage.getItem("passforge-theme");
-      if (saved) html.setAttribute("data-theme", saved);
+      const savedTheme = localStorage.getItem("passforge-theme");
+      if (savedTheme) html.setAttribute("data-theme", savedTheme);
 
       document.getElementById("themeToggle").addEventListener("click", () => {
         const next =
@@ -1298,14 +1544,13 @@
         localStorage.setItem("passforge-theme", next);
       });
 
-      // ═══ CHARSETS ═══
+      // ═══ CHARSETS & STATE ═══
       const CHARS = {
         uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         lowercase: "abcdefghijklmnopqrstuvwxyz",
         numbers: "0123456789",
         symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?",
       };
-
       const state = {
         length: 16,
         options: {
@@ -1316,91 +1561,81 @@
         },
         history: [],
       };
+      let lastPw = "";
 
       // ═══ GENERATE ═══
       function generatePassword() {
         let charset = "";
         const active = Object.entries(state.options).filter(([, v]) => v);
         if (!active.length) return "";
-
-        active.forEach(([key]) => (charset += CHARS[key]));
-
-        const array = new Uint32Array(state.length);
-        crypto.getRandomValues(array);
-
-        let password = [];
-        active.forEach(([key], i) => {
-          const set = CHARS[key];
+        active.forEach(([k]) => (charset += CHARS[k]));
+        const arr = new Uint32Array(state.length);
+        crypto.getRandomValues(arr);
+        let pw = [];
+        active.forEach(([k], i) => {
+          const s = CHARS[k];
           const r = new Uint32Array(1);
           crypto.getRandomValues(r);
-          password[i] = set[r[0] % set.length];
+          pw[i] = s[r[0] % s.length];
         });
-
-        for (let i = active.length; i < state.length; i++) {
-          password[i] = charset[array[i] % charset.length];
-        }
-
-        for (let i = password.length - 1; i > 0; i--) {
+        for (let i = active.length; i < state.length; i++)
+          pw[i] = charset[arr[i] % charset.length];
+        for (let i = pw.length - 1; i > 0; i--) {
           const r = new Uint32Array(1);
           crypto.getRandomValues(r);
           const j = r[0] % (i + 1);
-          [password[i], password[j]] = [password[j], password[i]];
+          [pw[i], pw[j]] = [pw[j], pw[i]];
         }
-
-        return password.join("");
+        return pw.join("");
       }
 
       // ═══ STRENGTH ═══
       function calcStrength(pw) {
         if (!pw) return { level: 0, label: "-", time: "", cls: "" };
-
         let pool = 0;
         if (/[a-z]/.test(pw)) pool += 26;
         if (/[A-Z]/.test(pw)) pool += 26;
         if (/[0-9]/.test(pw)) pool += 10;
         if (/[^a-zA-Z0-9]/.test(pw)) pool += 32;
-
-        const entropy = pw.length * Math.log2(pool || 1);
-        const secs = Math.pow(2, entropy) / 1e10;
-
+        const ent = pw.length * Math.log2(pool || 1),
+          secs = Math.pow(2, ent) / 1e10;
         let time;
-        if (secs < 1) time = "мгновенно";
-        else if (secs < 60) time = `~${Math.ceil(secs)} сек`;
-        else if (secs < 3600) time = `~${Math.ceil(secs / 60)} мин`;
-        else if (secs < 86400) time = `~${Math.ceil(secs / 3600)} ч`;
-        else if (secs < 86400 * 365) time = `~${Math.ceil(secs / 86400)} дн`;
+        if (secs < 1) time = t("s_instant");
+        else if (secs < 60) time = `~${Math.ceil(secs)} ${t("s_sec")}`;
+        else if (secs < 3600) time = `~${Math.ceil(secs / 60)} ${t("s_min")}`;
+        else if (secs < 86400) time = `~${Math.ceil(secs / 3600)} ${t("s_h")}`;
+        else if (secs < 86400 * 365)
+          time = `~${Math.ceil(secs / 86400)} ${t("s_d")}`;
         else if (secs < 86400 * 365 * 1e3)
-          time = `~${Math.ceil(secs / (86400 * 365))} лет`;
+          time = `~${Math.ceil(secs / (86400 * 365))} ${t("s_y")}`;
         else if (secs < 86400 * 365 * 1e6)
-          time = `~${(secs / (86400 * 365e3)).toFixed(0)}K лет`;
+          time = `~${(secs / (86400 * 365e3)).toFixed(0)}K ${t("s_y")}`;
         else if (secs < 86400 * 365 * 1e9)
-          time = `~${(secs / (86400 * 365e6)).toFixed(0)}M лет`;
-        else time = `${(secs / (86400 * 365e9)).toFixed(0)}B+ лет`;
-
+          time = `~${(secs / (86400 * 365e6)).toFixed(0)}M ${t("s_y")}`;
+        else time = `${(secs / (86400 * 365e9)).toFixed(0)}B+ ${t("s_y")}`;
         let level, label, cls;
-        if (entropy < 30) {
+        if (ent < 30) {
           level = 15;
-          label = "Очень слабый";
+          label = t("s_vweak");
           cls = "strength-weak";
-        } else if (entropy < 50) {
+        } else if (ent < 50) {
           level = 35;
-          label = "Слабый";
+          label = t("s_weak");
           cls = "strength-fair";
-        } else if (entropy < 70) {
+        } else if (ent < 70) {
           level = 60;
-          label = "Хороший";
+          label = t("s_good");
           cls = "strength-good";
-        } else if (entropy < 90) {
+        } else if (ent < 90) {
           level = 80;
-          label = "Сильный";
+          label = t("s_strong");
           cls = "strength-strong";
         } else {
           level = 100;
-          label = "Отличный";
+          label = t("s_excellent");
           cls = "strength-strong";
         }
-
-        return { level, label, time: `взлом: ${time}`, cls };
+        return { level, label, time: `${t("s_crack")}: ${time}`, cls };
       }
 
       // ═══ UI ═══
@@ -1410,7 +1645,6 @@
       const strengthTime = document.getElementById("strengthTime");
       const lengthSlider = document.getElementById("lengthSlider");
       const lengthValue = document.getElementById("lengthValue");
-
       const barColors = {
         "strength-weak": "var(--red)",
         "strength-fair": "var(--orange)",
@@ -1418,16 +1652,28 @@
         "strength-strong": "var(--green)",
       };
 
+      function refreshStrength() {
+        if (!lastPw) return;
+        const s = calcStrength(lastPw);
+        strengthFill.style.width = s.level + "%";
+        strengthFill.style.background = barColors[s.cls] || "var(--accent)";
+        strengthLabel.textContent = s.label;
+        strengthLabel.className = "strength-label " + s.cls;
+        strengthTime.textContent = s.time;
+      }
+
       function updatePassword() {
         const pw = generatePassword();
         if (!pw) {
-          passwordText.textContent = "Выберите хотя бы один тип";
+          passwordText.textContent = t("pw_empty");
           strengthFill.style.width = "0%";
           strengthLabel.textContent = "-";
           strengthLabel.className = "strength-label";
           strengthTime.textContent = "";
+          lastPw = "";
           return;
         }
+        lastPw = pw;
         passwordText.textContent = pw;
         const s = calcStrength(pw);
         strengthFill.style.width = s.level + "%";
@@ -1438,11 +1684,13 @@
         addHistory(pw);
       }
 
+      // ═══ HISTORY ═══
       function addHistory(pw) {
+        const locale = curLang === "ru" ? "ru-RU" : "en-US";
         state.history.unshift({
           pw,
           len: pw.length,
-          time: new Date().toLocaleTimeString("ru-RU", {
+          time: new Date().toLocaleTimeString(locale, {
             hour: "2-digit",
             minute: "2-digit",
           }),
@@ -1452,13 +1700,15 @@
       }
 
       function renderHistory() {
-        const sec = document.getElementById("historySection");
-        const list = document.getElementById("historyList");
+        const sec = document.getElementById("historySection"),
+          list = document.getElementById("historyList");
         if (!state.history.length) {
           sec.style.display = "none";
           return;
         }
         sec.style.display = "block";
+        const cw = t("history_chars"),
+          ct = t("copy_tip");
         list.innerHTML = state.history
           .map((h, i) => {
             const safe = h.pw
@@ -1467,11 +1717,7 @@
               .replace(/>/g, "&gt;")
               .replace(/"/g, "&quot;");
             const jsafe = h.pw.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-            return `<div class="history-item" style="animation-delay:${i * 0.05}s">
-      <span class="history-pw">${safe}</span>
-      <span class="history-meta">${h.len} симв · ${h.time}</span>
-      <button class="history-copy" onclick="copyPw('${jsafe}')" title="Копировать">📋</button>
-    </div>`;
+            return `<div class="history-item" style="animation-delay:${i * 0.05}s"><span class="history-pw">${safe}</span><span class="history-meta">${h.len} ${cw} · ${h.time}</span><button class="history-copy" onclick="copyPw('${jsafe}')" title="${ct}">📋</button></div>`;
           })
           .join("");
       }
@@ -1488,7 +1734,6 @@
         lengthValue.textContent = v;
         state.length = +v;
       }
-
       lengthSlider.addEventListener("input", () => {
         updateSlider();
         updatePassword();
@@ -1497,15 +1742,15 @@
       // ═══ CHAR OPTIONS ═══
       document.querySelectorAll(".char-option").forEach((el) => {
         el.addEventListener("click", () => {
-          const t = el.dataset.type;
-          const cnt = Object.values(state.options).filter(Boolean).length;
-          if (state.options[t] && cnt <= 1) {
-            showToast("⚠️ Нужен хотя бы один тип символов");
+          const tp = el.dataset.type,
+            cnt = Object.values(state.options).filter(Boolean).length;
+          if (state.options[tp] && cnt <= 1) {
+            showToast(t("t_mintype"));
             el.style.animation = "shake 0.4s ease";
             setTimeout(() => (el.style.animation = ""), 400);
             return;
           }
-          state.options[t] = !state.options[t];
+          state.options[tp] = !state.options[tp];
           el.classList.toggle("active");
           updatePassword();
         });
@@ -1515,7 +1760,7 @@
       async function copyPw(text) {
         try {
           await navigator.clipboard.writeText(text);
-          showToast("✅ Скопировано в буфер обмена");
+          showToast(t("t_copied"));
         } catch {
           const ta = document.createElement("textarea");
           ta.value = text;
@@ -1524,13 +1769,13 @@
           ta.select();
           document.execCommand("copy");
           document.body.removeChild(ta);
-          showToast("✅ Скопировано");
+          showToast(t("t_copied2"));
         }
       }
 
       document.getElementById("copyBtn").addEventListener("click", () => {
         const pw = passwordText.textContent;
-        if (pw && pw !== "-" && !pw.startsWith("Выберите")) {
+        if (pw && pw !== "-" && pw !== t("pw_empty")) {
           copyPw(pw);
           const b = document.getElementById("copyBtn");
           b.classList.add("copied");
@@ -1555,17 +1800,17 @@
       document.getElementById("clearHistory").addEventListener("click", () => {
         state.history = [];
         renderHistory();
-        showToast("🗑️ История очищена");
+        showToast(t("t_cleared"));
       });
 
       // ═══ TOAST ═══
       let tt;
       function showToast(msg) {
-        const t = document.getElementById("toast");
-        t.textContent = msg;
-        t.classList.add("show");
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
         clearTimeout(tt);
-        tt = setTimeout(() => t.classList.remove("show"), 2500);
+        tt = setTimeout(() => el.classList.remove("show"), 2500);
       }
 
       // ═══ FAQ ═══
@@ -1600,6 +1845,7 @@
       // ═══ INIT ═══
       updateSlider();
       updatePassword();
+      applyLang();
     </script>
   </body>
 </html>
