@@ -1112,10 +1112,17 @@
             id="langRu"
             type="button"
             aria-pressed="true"
+            aria-label="Русский"
           >
             RU
           </button>
-          <button class="lang-btn" id="langEn" type="button" aria-pressed="false">
+          <button
+            class="lang-btn"
+            id="langEn"
+            type="button"
+            aria-pressed="false"
+            aria-label="English"
+          >
             EN
           </button>
         </div>
@@ -1432,6 +1439,7 @@
           s_y: "лет",
           t_copied: "✅ Скопировано в буфер обмена",
           t_copied2: "✅ Скопировано",
+          t_copy_fail: "⚠️ Не удалось скопировать",
           t_cleared: "🗑️ История очищена",
           t_mintype: "⚠️ Нужен хотя бы один тип символов",
           pw_empty: "Выберите хотя бы один тип",
@@ -1506,6 +1514,7 @@
           s_y: "yrs",
           t_copied: "✅ Copied to clipboard",
           t_copied2: "✅ Copied",
+          t_copy_fail: "⚠️ Copy failed",
           t_cleared: "🗑️ History cleared",
           t_mintype: "⚠️ At least one character type required",
           pw_empty: "Select at least one type",
@@ -1633,6 +1642,9 @@
         numbers: "0123456789",
         symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?",
       };
+      // Явный порядок типов - чтобы гарантия «по одному символу каждого типа»
+      // не зависела от порядка свойств в state.options.
+      const TYPES = ["uppercase", "lowercase", "numbers", "symbols"];
       const state = {
         length: 16,
         options: {
@@ -1645,35 +1657,39 @@
       };
       let lastPw = "";
 
+      // Криптостойкий равномерный индекс [0, n) через rejection sampling -
+      // отбрасываем «хвост» 2^32, не кратный n, чтобы избежать modulo-bias.
+      function randIndex(n) {
+        if (n <= 0) return 0;
+        const max = Math.floor(0x100000000 / n) * n;
+        const r = new Uint32Array(1);
+        do {
+          crypto.getRandomValues(r);
+        } while (r[0] >= max);
+        return r[0] % n;
+      }
+
       // ═══ GENERATE ═══
       function generatePassword() {
-        const active = Object.entries(state.options).filter(([, v]) => v);
+        const active = TYPES.filter((k) => state.options[k]);
         if (!active.length) return "";
         // Защита: длина пароля не может быть меньше числа активных типов,
         // иначе мы не сможем гарантировать наличие каждого типа.
         const targetLen = Math.max(state.length, active.length);
-        const charset = active.map(([k]) => CHARS[k]).join("");
+        const charset = active.map((k) => CHARS[k]).join("");
         const pw = new Array(targetLen);
         // Гарантируем по одному символу каждого активного типа
-        active.forEach(([k], i) => {
+        active.forEach((k, i) => {
           const s = CHARS[k];
-          const r = new Uint32Array(1);
-          crypto.getRandomValues(r);
-          pw[i] = s[r[0] % s.length];
+          pw[i] = s[randIndex(s.length)];
         });
         // Добиваем остаток случайными символами из общего набора
-        if (targetLen > active.length) {
-          const arr = new Uint32Array(targetLen - active.length);
-          crypto.getRandomValues(arr);
-          for (let i = active.length, j = 0; i < targetLen; i++, j++) {
-            pw[i] = charset[arr[j] % charset.length];
-          }
+        for (let i = active.length; i < targetLen; i++) {
+          pw[i] = charset[randIndex(charset.length)];
         }
         // Перемешиваем (Fisher-Yates) на крипто-стойкой случайности
         for (let i = pw.length - 1; i > 0; i--) {
-          const r = new Uint32Array(1);
-          crypto.getRandomValues(r);
-          const j = r[0] % (i + 1);
+          const j = randIndex(i + 1);
           [pw[i], pw[j]] = [pw[j], pw[i]];
         }
         return pw.join("");
@@ -1688,10 +1704,14 @@
         if (/[0-9]/.test(pw)) pool += 10;
         if (/[^a-zA-Z0-9]/.test(pw)) pool += 32;
         const ent = pw.length * Math.log2(pool || 1),
-          // 1e11 ≈ 100 млрд попыток/сек - порядок современных GPU для слабых хэшей
+          // 1e11 ≈ 100 млрд попыток/сек - порядок современных GPU
+          // для слабых офлайн-хэшей (MD5/SHA-1 без соли). Для bcrypt/argon2
+          // или онлайн-атак реальная скорость на порядки ниже.
           secs = Math.pow(2, ent) / 1e11;
         let time;
-        if (secs < 1) time = t("s_instant");
+        if (!isFinite(secs) || secs > 86400 * 365 * 1e12)
+          time = `∞ ${t("s_y")}`;
+        else if (secs < 1) time = t("s_instant");
         else if (secs < 60) time = `~${Math.ceil(secs)} ${t("s_sec")}`;
         else if (secs < 3600) time = `~${Math.ceil(secs / 60)} ${t("s_min")}`;
         else if (secs < 86400) time = `~${Math.ceil(secs / 3600)} ${t("s_h")}`;
@@ -1786,7 +1806,7 @@
             minute: "2-digit",
           }),
         });
-        if (state.history.length > 8) state.history.pop();
+        if (state.history.length > 8) state.history = state.history.slice(0, 8);
         renderHistory();
       }
 
@@ -1850,33 +1870,46 @@
 
       // ═══ COPY ═══
       async function copyPw(text) {
+        if (!text) return false;
         try {
-          await navigator.clipboard.writeText(text);
-          showToast(t("t_copied"));
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            showToast(t("t_copied"));
+            return true;
+          }
+          throw new Error("clipboard unavailable");
         } catch {
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.style.cssText = "position:fixed;opacity:0";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-          showToast(t("t_copied2"));
+          // Legacy fallback (document.execCommand устарел, но всё ещё
+          // работает в большинстве браузеров и нужен для http:// контекстов).
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "");
+            ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            if (!ok) throw new Error("execCommand failed");
+            showToast(t("t_copied2"));
+            return true;
+          } catch {
+            showToast(t("t_copy_fail"));
+            return false;
+          }
         }
       }
 
       document.getElementById("copyBtn").addEventListener("click", () => {
-        const pw = passwordText.textContent;
-        if (pw && pw !== "-" && pw !== t("pw_empty")) {
-          copyPw(pw);
-          const b = document.getElementById("copyBtn");
-          b.classList.add("copied");
-          b.textContent = "✓";
-          setTimeout(() => {
-            b.classList.remove("copied");
-            b.textContent = "📋";
-          }, 1500);
-        }
+        if (!lastPw) return;
+        copyPw(lastPw);
+        const b = document.getElementById("copyBtn");
+        b.classList.add("copied");
+        b.textContent = "✓";
+        setTimeout(() => {
+          b.classList.remove("copied");
+          b.textContent = "📋";
+        }, 1500);
       });
 
       document
@@ -1943,16 +1976,28 @@
 
       // ═══ KEYBOARD ═══
       document.addEventListener("keydown", (e) => {
-        if (e.key === " " && e.target === document.body) {
-          e.preventDefault();
-          updatePassword();
-        }
+        if (e.code !== "Space") return;
+        // Не перехватываем пробел на интерактивных элементах,
+        // где он имеет собственное значение (ввод, нажатие кнопки и т.п.).
+        const tgt = e.target;
+        if (
+          tgt &&
+          tgt.closest &&
+          tgt.closest(
+            'input, button, textarea, select, a, [contenteditable=""], [contenteditable="true"]'
+          )
+        )
+          return;
+        e.preventDefault();
+        updatePassword();
       });
 
       // ═══ INIT ═══
+      // applyLang() до updatePassword(), чтобы первый пароль и метка
+      // крепости сразу отрендерились в правильном языке (без перерисовки).
       updateSlider();
-      updatePassword();
       applyLang();
+      updatePassword();
     </script>
   </body>
 </html>
