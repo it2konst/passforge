@@ -4,6 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PassForge - Генератор надёжных паролей</title>
+    <meta
+      name="description"
+      id="metaDesc"
+      content="Бесплатный генератор криптостойких паролей. Работает полностью в браузере - никакие данные не отправляются на сервер."
+    />
+    <meta property="og:title" content="PassForge - Генератор надёжных паролей" />
+    <meta
+      property="og:description"
+      content="Криптостойкие пароли прямо в браузере. Безопасно, локально, бесплатно."
+    />
+    <meta property="og:type" content="website" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
@@ -14,9 +29,13 @@
       (function () {
         try {
           var t = localStorage.getItem("passforge-theme");
-          if (t === "light" || t === "dark") {
-            document.documentElement.setAttribute("data-theme", t);
+          if (t !== "light" && t !== "dark") {
+            // Нет сохранённого выбора - уважаем системную тему
+            t = window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
           }
+          document.documentElement.setAttribute("data-theme", t);
         } catch (e) {}
       })();
     </script>
@@ -96,6 +115,20 @@
 
       html {
         scroll-behavior: smooth;
+      }
+
+      /* ACCESSIBILITY: уважаем настройку сниженной анимации */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
       }
 
       body {
@@ -971,16 +1004,18 @@
       }
 
       .faq-answer {
-        max-height: 0;
+        display: grid;
+        grid-template-rows: 0fr;
         overflow: hidden;
-        transition: max-height 0.4s var(--ease);
+        transition: grid-template-rows 0.4s var(--ease);
       }
 
       .faq-item.open .faq-answer {
-        max-height: 300px;
+        grid-template-rows: 1fr;
       }
 
       .faq-answer-inner {
+        min-height: 0;
         padding: 0 1.5rem 1.25rem;
         font-size: 0.88rem;
         color: var(--text-dim);
@@ -1129,7 +1164,9 @@
         <button
           class="theme-toggle"
           id="themeToggle"
-          aria-label="Переключить тему"
+          role="switch"
+          aria-checked="true"
+          aria-label="Тёмная тема"
         >
           <span class="t-icon t-moon">🌙</span>
           <span class="t-icon t-sun">☀️</span>
@@ -1481,8 +1518,9 @@
           footer:
             "PassForge © 2026 - Генератор паролей. Работает полностью в вашем браузере.",
           page_title: "PassForge - Генератор надёжных паролей",
-          theme_to_light: "Переключить на светлую тему",
-          theme_to_dark: "Переключить на тёмную тему",
+          theme_switch: "Тёмная тема",
+          meta_desc:
+            "Бесплатный генератор криптостойких паролей. Работает полностью в браузере - никакие данные не отправляются на сервер.",
         },
         en: {
           nav_tips: "Tips",
@@ -1556,8 +1594,9 @@
           footer:
             "PassForge © 2026 - Password Generator. Runs entirely in your browser.",
           page_title: "PassForge - Secure Password Generator",
-          theme_to_light: "Switch to light theme",
-          theme_to_dark: "Switch to dark theme",
+          theme_switch: "Dark theme",
+          meta_desc:
+            "Free cryptographically secure password generator. Runs entirely in your browser - no data is ever sent to any server.",
         },
       };
 
@@ -1588,6 +1627,8 @@
         document.documentElement.setAttribute("data-lang", curLang);
         document.documentElement.setAttribute("lang", curLang);
         document.title = t("page_title");
+        const md = document.getElementById("metaDesc");
+        if (md) md.setAttribute("content", t("meta_desc"));
         const langRuBtn = document.getElementById("langRu");
         const langEnBtn = document.getElementById("langEn");
         const isRu = curLang === "ru";
@@ -1632,7 +1673,9 @@
       function updateThemeAriaLabel() {
         const btn = document.getElementById("themeToggle");
         const isDark = html.getAttribute("data-theme") === "dark";
-        btn.setAttribute("aria-label", t(isDark ? "theme_to_light" : "theme_to_dark"));
+        // role="switch": label называет настройку, aria-checked - состояние
+        btn.setAttribute("aria-label", t("theme_switch"));
+        btn.setAttribute("aria-checked", String(isDark));
       }
 
       // ═══ CHARSETS & STATE ═══
@@ -1773,7 +1816,7 @@
         strengthTime.textContent = s.time;
       }
 
-      function updatePassword() {
+      function updatePassword(saveToHistory = true) {
         const pw = generatePassword();
         if (!pw) {
           passwordText.textContent = t("pw_empty");
@@ -1792,7 +1835,7 @@
         strengthLabel.textContent = s.label;
         strengthLabel.className = "strength-label " + s.cls;
         strengthTime.textContent = s.time;
-        addHistory(pw);
+        if (saveToHistory) addHistory(pw);
       }
 
       // ═══ HISTORY ═══
@@ -1845,9 +1888,15 @@
         lengthValue.textContent = v;
         state.length = +v;
       }
+      // При перетаскивании ползунка пароль обновляется live, но историю
+      // не засоряем промежуточными значениями - пишем одну запись
+      // на событии change (отпускание ползунка).
       lengthSlider.addEventListener("input", () => {
         updateSlider();
-        updatePassword();
+        updatePassword(false);
+      });
+      lengthSlider.addEventListener("change", () => {
+        if (lastPw) addHistory(lastPw);
       });
 
       // ═══ CHAR OPTIONS ═══
@@ -1900,17 +1949,20 @@
         }
       }
 
-      document.getElementById("copyBtn").addEventListener("click", () => {
-        if (!lastPw) return;
-        copyPw(lastPw);
-        const b = document.getElementById("copyBtn");
-        b.classList.add("copied");
-        b.textContent = "✓";
-        setTimeout(() => {
-          b.classList.remove("copied");
-          b.textContent = "📋";
-        }, 1500);
-      });
+      document
+        .getElementById("copyBtn")
+        .addEventListener("click", async () => {
+          if (!lastPw) return;
+          const ok = await copyPw(lastPw);
+          if (!ok) return; // тост об ошибке уже показан в copyPw
+          const b = document.getElementById("copyBtn");
+          b.classList.add("copied");
+          b.textContent = "✓";
+          setTimeout(() => {
+            b.classList.remove("copied");
+            b.textContent = "📋";
+          }, 1500);
+        });
 
       document
         .getElementById("refreshBtn")
@@ -1988,6 +2040,12 @@
           )
         )
           return;
+        // Перехватываем пробел только когда карточка генератора видна,
+        // иначе оставляем браузеру его стандартный скролл страницы.
+        const gen = document.querySelector(".generator");
+        const rect = gen.getBoundingClientRect();
+        const inView = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!inView) return;
         e.preventDefault();
         updatePassword();
       });
@@ -1997,7 +2055,7 @@
       // крепости сразу отрендерились в правильном языке (без перерисовки).
       updateSlider();
       applyLang();
-      updatePassword();
+      updatePassword(false); // стартовый пароль не пишем в историю
     </script>
   </body>
 </html>
