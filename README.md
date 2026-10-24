@@ -10,7 +10,7 @@
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/Vanilla_JS-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![No Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)]()
+![No Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 
 [English](#-english) · [Русский](#-русский)
 
@@ -28,13 +28,12 @@
 - Rejection sampling to eliminate modulo bias in random indices
 - Adjustable length from 4 to 64 characters
 - Four character types: uppercase, lowercase, digits, symbols
-- Guaranteed inclusion of at least one character from each selected type
-- Fisher-Yates shuffle (on crypto-grade randomness) for unbiased character placement
+- Every selected character type is guaranteed via rejection sampling at the password level, so all valid passwords are equally likely
 
 **Strength Analysis**
 
-- Real-time entropy-based strength calculation
-- Brute-force crack time estimation (assuming ~100 billion guesses/sec - GPU speed for fast unsalted hashes; slow hashes like bcrypt/argon2 raise real-world times by orders of magnitude)
+- Real-time strength calculation with exact entropy: log2 of the number of passwords the generator can produce for the current settings
+- Average brute-force crack time estimation (assuming ~100 billion guesses/sec - GPU speed for fast unsalted hashes; slow hashes like bcrypt/argon2 raise real-world times by orders of magnitude)
 - Color-coded animated strength bar (red → orange → purple → green)
 - Five strength levels: Very Weak, Weak, Good, Strong, Excellent
 
@@ -52,6 +51,7 @@
 
 - Respects `prefers-reduced-motion` - animations and smooth scrolling are disabled
 - `role="switch"` + `aria-checked` on the theme toggle, `aria-pressed` on option buttons
+- `aria-label` on icon-only buttons, labelled length slider, strength bar exposed as `role="meter"`
 - `aria-expanded` on FAQ items, live-region toast, visible `:focus-visible` outlines
 
 **Design & Animations**
@@ -70,7 +70,7 @@
 
 ### 🛡️ Privacy
 
-PassForge runs **100% client-side**. No data is ever sent to any server. No cookies, no tracking, no analytics. Generated passwords never leave your device and are never persisted - only your theme and language preferences are stored in `localStorage`.
+PassForge runs **100% client-side**. No data is ever sent to any server. No cookies, no tracking, no analytics, no external fonts or CDNs: the page makes zero network requests, and a Content-Security-Policy (`connect-src 'none'`) blocks it from sending data anywhere. Generated passwords never leave your device and are never persisted - only your theme and language preferences are stored in `localStorage`.
 
 ### 🌍 Live Demo
 
@@ -97,6 +97,7 @@ Or deploy to any static hosting: GitHub Pages, Netlify, Vercel, Cloudflare Pages
 | CSS3 Custom Properties | Theming system (30+ variables)              |
 | Vanilla JavaScript     | All logic, zero dependencies                |
 | Web Crypto API         | Cryptographically secure random generation  |
+| Content-Security-Policy | Blocks external resources and outgoing requests |
 | IntersectionObserver   | Scroll-triggered animations                 |
 | localStorage           | Theme & language preference persistence    |
 
@@ -143,13 +144,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Rejection sampling для устранения modulo bias при выборе случайных индексов
 - Настраиваемая длина от 4 до 64 символов
 - Четыре типа символов: заглавные, строчные, цифры, спецсимволы
-- Гарантированное включение минимум одного символа каждого выбранного типа
-- Перемешивание по алгоритму Фишера-Йетса (на криптостойкой случайности) для равномерного распределения
+- Каждый выбранный тип символов гарантирован за счёт rejection sampling на уровне всего пароля, поэтому все допустимые пароли равновероятны
 
 **Анализ надёжности**
 
-- Расчёт надёжности в реальном времени на основе энтропии
-- Оценка времени взлома брутфорсом (при ~100 млрд попыток/сек - скорость GPU для быстрых хэшей без соли; медленные хэши вроде bcrypt/argon2 увеличивают реальное время на порядки)
+- Расчёт надёжности в реальном времени по точной энтропии: log2 от числа паролей, которые генератор может выдать при текущих настройках
+- Оценка среднего времени взлома брутфорсом (при ~100 млрд попыток/сек - скорость GPU для быстрых хэшей без соли; медленные хэши вроде bcrypt/argon2 увеличивают реальное время на порядки)
 - Анимированная цветовая шкала (красный → оранжевый → фиолетовый → зелёный)
 - Пять уровней: Очень слабый, Слабый, Хороший, Сильный, Отличный
 
@@ -167,6 +167,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Учитывается `prefers-reduced-motion` - анимации и плавный скролл отключаются
 - `role="switch"` + `aria-checked` у переключателя темы, `aria-pressed` у кнопок-опций
+- `aria-label` у кнопок-иконок, подписанный слайдер длины, шкала надёжности с `role="meter"`
 - `aria-expanded` в FAQ, live-region для тостов, видимые обводки `:focus-visible`
 
 **Дизайн и анимации**
@@ -185,7 +186,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### 🛡️ Приватность
 
-PassForge работает **на 100% на стороне клиента**. Никакие данные не отправляются на сервер. Без cookies, без трекинга, без аналитики. Сгенерированные пароли никогда не покидают устройство и нигде не сохраняются - в `localStorage` хранятся только выбранные тема и язык.
+PassForge работает **на 100% на стороне клиента**. Никакие данные не отправляются на сервер. Без cookies, без трекинга, без аналитики, без внешних шрифтов и CDN: страница не делает ни одного сетевого запроса, а Content-Security-Policy (`connect-src 'none'`) не даёт ей никуда отправить данные. Сгенерированные пароли никогда не покидают устройство и нигде не сохраняются - в `localStorage` хранятся только выбранные тема и язык.
 
 ### 🌍 Живое демо
 
@@ -212,6 +213,7 @@ cd passforge
 | CSS3 Custom Properties | Система тем (30+ переменных)             |
 | Vanilla JavaScript     | Вся логика, ноль зависимостей            |
 | Web Crypto API         | Криптостойкая генерация случайных чисел  |
+| Content-Security-Policy | Блокирует внешние ресурсы и исходящие запросы |
 | IntersectionObserver   | Анимации при скролле                     |
 | localStorage           | Сохранение темы и языка                  |
 
