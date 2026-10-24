@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSP: страница не может загрузить внешние ресурсы и никуда не может
+         отправить данные (connect-src/form-action 'none'). Inline-код
+         разрешён, потому что всё приложение живёт в одном файле. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'"
+    />
     <title>PassForge - Генератор надёжных паролей</title>
     <meta
       name="description"
@@ -18,11 +25,6 @@
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
     />
     <script>
       // Применяем тему ДО отрисовки CSS, чтобы избежать FOUC
@@ -49,8 +51,14 @@
       }
 
       :root {
-        --font-main: "Outfit", sans-serif;
-        --font-mono: "JetBrains Mono", monospace;
+        /* Без внешних шрифтов: страница не делает ни одного сетевого запроса.
+           Outfit / JetBrains Mono используются, если установлены локально. */
+        --font-main:
+          "Outfit", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        --font-mono:
+          "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+          "Liberation Mono", monospace;
         --ease: cubic-bezier(0.4, 0, 0.2, 1);
         --transition: 0.45s var(--ease);
       }
@@ -1164,6 +1172,7 @@
         <button
           class="theme-toggle"
           id="themeToggle"
+          type="button"
           role="switch"
           aria-checked="true"
           aria-label="Тёмная тема"
@@ -1191,17 +1200,37 @@
         <div class="password-display">
           <div class="password-text" id="passwordText">-</div>
           <div class="password-actions">
-            <button class="icon-btn" id="copyBtn" title="Скопировать">
+            <button
+              class="icon-btn"
+              id="copyBtn"
+              type="button"
+              title="Скопировать"
+              aria-label="Скопировать"
+            >
               📋
             </button>
-            <button class="icon-btn" id="refreshBtn" title="Новый пароль">
+            <button
+              class="icon-btn"
+              id="refreshBtn"
+              type="button"
+              title="Новый пароль"
+              aria-label="Новый пароль"
+            >
               🔄
             </button>
           </div>
         </div>
 
         <div class="strength-section">
-          <div class="strength-bar-track">
+          <div
+            class="strength-bar-track"
+            id="strengthMeter"
+            role="meter"
+            aria-label="Надёжность пароля"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
             <div class="strength-bar-fill" id="strengthFill"></div>
           </div>
           <div class="strength-info">
@@ -1212,7 +1241,7 @@
 
         <div class="control-group">
           <div class="control-header">
-            <span class="control-label" data-i18n="length_label"
+            <span class="control-label" id="lengthLabel" data-i18n="length_label"
               >Длина пароля</span
             >
             <span class="control-value" id="lengthValue">16</span>
@@ -1221,6 +1250,7 @@
             <input
               type="range"
               id="lengthSlider"
+              aria-labelledby="lengthLabel"
               class="styled"
               min="4"
               max="64"
@@ -1292,7 +1322,7 @@
           </button>
         </div>
 
-        <button class="generate-btn" id="generateBtn">
+        <button class="generate-btn" id="generateBtn" type="button">
           <span class="spin">⚡</span>
           <span data-i18n="btn_generate">Сгенерировать пароль</span>
         </button>
@@ -1304,6 +1334,7 @@
           <button
             class="history-clear"
             id="clearHistory"
+            type="button"
             data-i18n="history_clear"
           >
             Очистить
@@ -1482,6 +1513,7 @@
           pw_empty: "Выберите хотя бы один тип",
           copy_tip: "Скопировать",
           refresh_tip: "Новый пароль",
+          strength_aria: "Надёжность пароля",
           tips_title: "Советы по безопасности",
           tips_sub: "Как защитить свои учётные записи",
           tip1_t: "Уникальность",
@@ -1558,6 +1590,7 @@
           pw_empty: "Select at least one type",
           copy_tip: "Copy",
           refresh_tip: "New password",
+          strength_aria: "Password strength",
           tips_title: "Security Tips",
           tips_sub: "How to protect your accounts",
           tip1_t: "Uniqueness",
@@ -1642,8 +1675,19 @@
         document.querySelectorAll("[data-i18n-html]").forEach((el) => {
           el.innerHTML = t(el.getAttribute("data-i18n-html"));
         });
-        document.getElementById("copyBtn").title = t("copy_tip");
-        document.getElementById("refreshBtn").title = t("refresh_tip");
+        // У иконочных кнопок нет текста, поэтому кроме title (подсказка
+        // мышью) нужен aria-label - его читают скринридеры.
+        for (const [id, key] of [
+          ["copyBtn", "copy_tip"],
+          ["refreshBtn", "refresh_tip"],
+        ]) {
+          const btn = document.getElementById(id);
+          btn.title = t(key);
+          btn.setAttribute("aria-label", t(key));
+        }
+        document
+          .getElementById("strengthMeter")
+          .setAttribute("aria-label", t("strength_aria"));
         // aria-label кнопки темы зависит от текущей темы и языка
         if (typeof updateThemeAriaLabel === "function") updateThemeAriaLabel();
         refreshStrength();
@@ -1699,6 +1743,8 @@
         history: [],
       };
       let lastPw = "";
+      // Типы символов, с которыми был сгенерирован lastPw (для оценки энтропии)
+      let lastTypes = [];
 
       // Криптостойкий равномерный индекс [0, n) через rejection sampling -
       // отбрасываем «хвост» 2^32, не кратный n, чтобы избежать modulo-bias.
@@ -1719,38 +1765,68 @@
         // Защита: длина пароля не может быть меньше числа активных типов,
         // иначе мы не сможем гарантировать наличие каждого типа.
         const targetLen = Math.max(state.length, active.length);
-        const charset = active.map((k) => CHARS[k]).join("");
-        const pw = new Array(targetLen);
-        // Гарантируем по одному символу каждого активного типа
-        active.forEach((k, i) => {
-          const s = CHARS[k];
-          pw[i] = s[randIndex(s.length)];
-        });
-        // Добиваем остаток случайными символами из общего набора
-        for (let i = active.length; i < targetLen; i++) {
-          pw[i] = charset[randIndex(charset.length)];
-        }
-        // Перемешиваем (Fisher-Yates) на крипто-стойкой случайности
-        for (let i = pw.length - 1; i > 0; i--) {
-          const j = randIndex(i + 1);
-          [pw[i], pw[j]] = [pw[j], pw[i]];
-        }
-        return pw.join("");
+        const charset = getCharset();
+        // Rejection sampling на уровне всего пароля: каждый символ берётся
+        // равномерно из общего набора, а пароль, в котором не хватает
+        // какого-то из выбранных типов, генерируется заново. Так все
+        // допустимые пароли равновероятны. Принудительная вставка «по одному
+        // символу каждого типа» с последующим перемешиванием так не делает:
+        // она завышает частоту символов из маленьких наборов (при длине 16
+        // каждая цифра выпадала на ~12% чаще, чем должна).
+        // Повторы редки: даже при длине 4 со всеми типами в среднем ~14
+        // попыток, это доли миллисекунды.
+        let pw;
+        do {
+          pw = "";
+          for (let i = 0; i < targetLen; i++) {
+            pw += charset[randIndex(charset.length)];
+          }
+        } while (!active.every((k) => hasCharFrom(pw, CHARS[k])));
+        return pw;
+      }
+
+      function getCharset() {
+        return TYPES.filter((k) => state.options[k])
+          .map((k) => CHARS[k])
+          .join("");
+      }
+
+      function hasCharFrom(str, set) {
+        for (const c of str) if (set.includes(c)) return true;
+        return false;
       }
 
       // ═══ STRENGTH ═══
-      function calcStrength(pw) {
-        if (!pw) return { level: 0, label: "-", time: "", cls: "" };
-        let pool = 0;
-        if (/[a-z]/.test(pw)) pool += 26;
-        if (/[A-Z]/.test(pw)) pool += 26;
-        if (/[0-9]/.test(pw)) pool += 10;
-        if (/[^a-zA-Z0-9]/.test(pw)) pool += 32;
-        const ent = pw.length * Math.log2(pool || 1),
+      // Энтропия считается по параметрам генератора, а не угадывается по
+      // готовому паролю: log2 от числа паролей, которые генератор может
+      // выдать. Это пароли длины len из объединённого набора, где есть хотя
+      // бы один символ каждого выбранного типа. Их число находим по формуле
+      // включений-исключений: Σ (-1)^|S| · (размер набора без типов S)^len.
+      function entropyBits(len, types) {
+        const sizes = types.map((k) => CHARS[k].length);
+        let count = 0;
+        for (let mask = 0; mask < 1 << sizes.length; mask++) {
+          let n = 0,
+            excluded = 0;
+          sizes.forEach((size, i) => {
+            if (mask & (1 << i)) excluded++;
+            else n += size;
+          });
+          count += (excluded % 2 ? -1 : 1) * Math.pow(n, len);
+        }
+        return count > 0 ? Math.log2(count) : 0;
+      }
+
+      function calcStrength(pw, types) {
+        if (!pw || !types || !types.length)
+          return { level: 0, label: "-", time: "", cls: "" };
+        const ent = entropyBits(pw.length, types),
           // 1e11 ≈ 100 млрд попыток/сек - порядок современных GPU
           // для слабых офлайн-хэшей (MD5/SHA-1 без соли). Для bcrypt/argon2
           // или онлайн-атак реальная скорость на порядки ниже.
-          secs = Math.pow(2, ent) / 1e11;
+          // В среднем перебор находит пароль за половину пространства
+          // ключей, поэтому берём 2^(ent-1).
+          secs = Math.pow(2, ent - 1) / 1e11;
         let time;
         if (!isFinite(secs) || secs > 86400 * 365 * 1e12)
           time = `∞ ${t("s_y")}`;
@@ -1797,6 +1873,7 @@
       const strengthFill = document.getElementById("strengthFill");
       const strengthLabel = document.getElementById("strengthLabel");
       const strengthTime = document.getElementById("strengthTime");
+      const strengthMeter = document.getElementById("strengthMeter");
       const lengthSlider = document.getElementById("lengthSlider");
       const lengthValue = document.getElementById("lengthValue");
       const barColors = {
@@ -1806,36 +1883,27 @@
         "strength-strong": "var(--green)",
       };
 
+      // Перерисовывает шкалу надёжности для lastPw (или сбрасывает её).
       function refreshStrength() {
-        if (!lastPw) return;
-        const s = calcStrength(lastPw);
+        const s = calcStrength(lastPw, lastTypes);
         strengthFill.style.width = s.level + "%";
         strengthFill.style.background = barColors[s.cls] || "var(--accent)";
         strengthLabel.textContent = s.label;
-        strengthLabel.className = "strength-label " + s.cls;
+        strengthLabel.className = ("strength-label " + s.cls).trim();
         strengthTime.textContent = s.time;
+        strengthMeter.setAttribute("aria-valuenow", String(s.level));
+        if (lastPw)
+          strengthMeter.setAttribute("aria-valuetext", `${s.label}, ${s.time}`);
+        else strengthMeter.removeAttribute("aria-valuetext");
       }
 
       function updatePassword(saveToHistory = true) {
         const pw = generatePassword();
-        if (!pw) {
-          passwordText.textContent = t("pw_empty");
-          strengthFill.style.width = "0%";
-          strengthLabel.textContent = "-";
-          strengthLabel.className = "strength-label";
-          strengthTime.textContent = "";
-          lastPw = "";
-          return;
-        }
         lastPw = pw;
-        passwordText.textContent = pw;
-        const s = calcStrength(pw);
-        strengthFill.style.width = s.level + "%";
-        strengthFill.style.background = barColors[s.cls] || "var(--accent)";
-        strengthLabel.textContent = s.label;
-        strengthLabel.className = "strength-label " + s.cls;
-        strengthTime.textContent = s.time;
-        if (saveToHistory) addHistory(pw);
+        lastTypes = pw ? TYPES.filter((k) => state.options[k]) : [];
+        passwordText.textContent = pw || t("pw_empty");
+        refreshStrength();
+        if (pw && saveToHistory) addHistory(pw);
       }
 
       // ═══ HISTORY ═══
@@ -1871,7 +1939,7 @@
               .replace(/>/g, "&gt;")
               .replace(/"/g, "&quot;");
             const encoded = encodeURIComponent(h.pw);
-            return `<div class="history-item" style="animation-delay:${i * 0.05}s"><span class="history-pw">${safe}</span><span class="history-meta">${h.len} ${cw} · ${h.time}</span><button class="history-copy" type="button" data-copy="${encoded}" title="${ct}">📋</button></div>`;
+            return `<div class="history-item" style="animation-delay:${i * 0.05}s"><span class="history-pw">${safe}</span><span class="history-meta">${h.len} ${cw} · ${h.time}</span><button class="history-copy" type="button" data-copy="${encoded}" title="${ct}" aria-label="${ct}: ${h.len} ${cw}, ${h.time}">📋</button></div>`;
           })
           .join("");
       }
@@ -1966,7 +2034,7 @@
 
       document
         .getElementById("refreshBtn")
-        .addEventListener("click", updatePassword);
+        .addEventListener("click", () => updatePassword());
       document.getElementById("langRu").addEventListener("click", () => setLang("ru"));
       document.getElementById("langEn").addEventListener("click", () => setLang("en"));
       document.getElementById("generateBtn").addEventListener("click", () => {
